@@ -19,7 +19,7 @@ app.use("/users", require("./routes/users"));
 app.use("/cards", require("./routes/cards"));
 
 app.get("*", (req, res) => {
-  res.send({ message: "Страница не найдена" }, 404);
+  res.status(404).send({ message: "Страница не найдена" });
 });
 app.listen(PORT, () => {
   console.log(`App listening on port ${PORT}`);

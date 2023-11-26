@@ -1,32 +1,71 @@
+const { ObjectId } = require("mongoose").Types;
 const User = require("../models/user");
 
-module.exports.getUsers = (req, res, next) => {
-  console.log(req.user);
+module.exports.getUsers = (req, res) => {
   User.find({})
-    .then((users) => res.send({ data: users }))
-    .catch((err) => { res.err = err; next(); });
+    .then((users) => res.send({ users }))
+    .catch(() => { res.status(500).send({ message: "Произошла ошибка" }); });
 };
-module.exports.getUserById = (req, res, next) => {
+module.exports.getUserById = (req, res) => {
+  if (!ObjectId.isValid(req.params.userId)) {
+    res.status(400).send({ message: "Переданы некорректные данные для получения пользователя" });
+  } else {
   User.findById(req.params.userId)
-    .then((user) => res.send({ data: user }))
-    .catch((err) => { res.err = err; next(); });
+    .then((user) => {
+      if (!user) {
+        res.status(404).send({ message: "Такого пользователя не существует" });
+      } else {
+        res.send(user);
+      }
+    })
+    .catch(() => { res.status(500).send({ message: "Произошла ошибка" }); });
+  }
 };
-module.exports.createUser = (req, res, next) => {
+module.exports.createUser = (req, res) => {
   const { name, about, avatar } = req.body;
-  console.log(req.body);
   User.create({ name, about, avatar })
-    .then((user) => res.send({ data: user }))
-    .catch((err) => { res.err = err; next(); });
+    .then((user) => res.send({ user }))
+    .catch((err) => {
+      if (err.name === "ValidationError") {
+        res.status(400).send({ message: "Переданы некорректные данные при создании пользователя." });
+      } else {
+        res.status(500).send({ message: "Произошла ошибка" });
+      }
+    });
 };
-module.exports.updateProfile = (req, res, next) => {
+module.exports.updateProfile = (req, res) => {
   const { name, about } = req.body;
-  User.findByIdAndUpdate(req.user._id, { name, about }, { new: true })
-    .then((user) => res.send({ data: user }))
-    .catch((err) => { res.err = err; next(); });
+  User.findByIdAndUpdate(req.user._id, { name, about }, { new: true, runValidators: true })
+    .then((user) => {
+      if (!user) {
+        res.status(404).send({ message: "Пользователь с указанным _id не найден." });
+      } else {
+        res.send(user);
+      }
+    })
+    .catch((err) => {
+      if (err.name === "ValidationError") {
+        res.status(400).send({ message: "Переданы некорректные данные при обновлении профиля." });
+      } else {
+        res.status(500).send({ message: "Произошла ошибка" });
+      }
+    });
 };
-module.exports.updateAvatar = (req, res, next) => {
+module.exports.updateAvatar = (req, res) => {
   const { avatar } = req.body;
-  User.findByIdAndUpdate(req.user._id, { avatar }, { new: true })
-    .then((user) => res.send({ data: user }))
-    .catch((err) => { res.err = err; next(); });
+  User.findByIdAndUpdate(req.user._id, { avatar }, { new: true, runValidators: true })
+  .then((user) => {
+    if (!user) {
+      res.status(404).send({ message: "Пользователь с указанным _id не найден." });
+    } else {
+      res.send(user);
+    }
+  })
+  .catch((err) => {
+    if (err.name === "ValidationError") {
+      res.status(400).send({ message: "Переданы некорректные данные при обновлении аватара." });
+    } else {
+      res.status(500).send({ message: "Произошла ошибка" });
+    }
+  });
 };

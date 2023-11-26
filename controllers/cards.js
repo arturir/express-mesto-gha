@@ -32,7 +32,7 @@ module.exports.deleteCard = (req, res) => {
           res.send(card);
         }
       })
-      .catch(res.status(500).send({ message: "Произошла ошибка" }));
+      .catch(() => { res.status(500).send({ message: "Произошла ошибка" }); });
   }
 };
 module.exports.likeCard = (req, res) => {

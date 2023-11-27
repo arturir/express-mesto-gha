@@ -12,7 +12,7 @@ app.use((req, res, next) => {
   };
   next();
 });
-app.use(require("./routes/index"));
+app.use("/", require("./routes/index"));
 
 app.listen(PORT, () => {
   console.log(`App listening on port ${PORT}`);

@@ -31,6 +31,7 @@ router.use("*", auth, () => {
 });
 
 router.use(errors());
+// eslint-disable-next-line
 router.use((err, req, res, next) => {
   const { statusCode = 500, message } = err;
   res

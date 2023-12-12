@@ -2,8 +2,7 @@ const mongoose = require("mongoose");
 const validator = require("validator");
 const bcrypt = require("bcrypt");
 const UnauthorizedError = require("../errors/UnauthorizedError");
-
-const regexUrl = /[-a-zA-Z0-9@:%_\+.~#?&\/=]{2,256}\.[a-z]{2,4}\b(\/[-a-zA-Z0-9@:%_\+.~#?&\/=]*)?/i;
+const regExpUrl = require("../regexp/url");
 
 const userSchema = new mongoose.Schema({
   email: {
@@ -27,22 +26,19 @@ const userSchema = new mongoose.Schema({
     type: String,
     minLength: 2,
     maxLength: 30,
-    required: true,
     default: "Жак-Ив Кусто",
   },
   about: {
     type: String,
     minLength: 2,
     maxLength: 30,
-    required: true,
     default: "Исследователь",
   },
   avatar: {
     type: String,
-    required: true,
     default: "https://pictures.s3.yandex.net/resources/jacques-cousteau_1604399756.png",
     validate: {
-      validator: (v) => regexUrl.test(v),
+      validator: (v) => regExpUrl.test(v),
       message: () => "Указан неправильный URL",
     },
   },

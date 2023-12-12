@@ -25,23 +25,24 @@ module.exports.createCard = (req, res, next) => {
   });
 };
 module.exports.deleteCard = (req, res, next) => {
-  Card.findByIdAndDelete(req.params.cardId)
-    .then((card) => {
-      if (!card) {
-        throw new NotFoundError("Такой карточки не существует");
-      } else if (card.owner._id != req.user._id) {
-        throw new ForbiddenError("Вы не являетесь владельцем данной карточки");
-      } else {
-        res.send(card);
-      }
-    })
-    .catch((err) => {
-      if (err instanceof mongoose.Error.CastError) {
-        next(new BadRequestError("Переданы некорректные данные для удаления карточки."));
-      } else {
-        next(err);
-      }
-    });
+  Card.findById(req.params.cardId)
+  .then((card) => {
+    if (!card) {
+      throw new NotFoundError("Такой карточки не существует");
+    } else if (!card.owner.equals(req.user._id)) {
+      throw new ForbiddenError("Вы не являетесь владельцем данной карточки");
+    } else {
+      card.deleteOne()
+        .then(() => { res.send({ message: "Карточка удалена" }); })
+        .catch((err) => {
+          if (err instanceof mongoose.Error.CastError) {
+            next(new BadRequestError("Переданы некорректные данные для удаления карточки."));
+          } else {
+            next(err);
+          }
+        });
+    }
+  });
 };
 module.exports.likeCard = (req, res, next) => {
   Card.findByIdAndUpdate(req.params.cardId, { $addToSet: { likes: req.user._id } }, { new: true })

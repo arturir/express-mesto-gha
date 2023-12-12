@@ -1,5 +1,6 @@
 const router = require("express").Router();
 const { celebrate, Joi } = require("celebrate");
+const regExpUrl = require("../regexp/url");
 
 const {
   getUsers,
@@ -20,17 +21,17 @@ const validationBodyPatchMe = celebrate({
 });
 const validationBodyPatchAvatar = celebrate({
   body: Joi.object().keys({
-    avatar: Joi.string().required().min(2).regex(/[-a-zA-Z0-9@:%_\+.~#?&\/=]{2,256}\.[a-z]{2,4}\b(\/[-a-zA-Z0-9@:%_\+.~#?&\/=]*)?/i),
+    avatar: Joi.string().required().min(2).regex(regExpUrl),
   }),
 });
 const validationParams = celebrate({
   params: Joi.object().keys({
-    userId: Joi.string().alphanum().length(24),
+    userId: Joi.string().hex().length(24),
   }),
 });
 
 router.get("/", getUsers);
-router.get("/me", setCurrentUser, validationParams, getUserById);
+router.get("/me", setCurrentUser, getUserById);
 router.patch("/me", validationBodyPatchMe, setCurrentUser, updateProfile);
 router.patch("/me/avatar", validationBodyPatchAvatar, updateAvatar);
 router.get("/:userId", validationParams, getUserById);

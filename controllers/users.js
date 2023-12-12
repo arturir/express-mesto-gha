@@ -36,9 +36,23 @@ module.exports.getUserById = (req, res, next) => {
 module.exports.createUser = (req, res, next) => {
   bcrypt.hash(req.body.password, 10)
   .then((hash) => {
-    const { email, name, about, avatar } = req.body;
-    User.create({ email, password: hash, name, about, avatar })
-    .then((user) => res.send({ user }))
+    const {
+      email,
+      name,
+      about,
+      avatar,
+    } = req.body;
+    User.create({
+      email,
+      password: hash,
+      name,
+      about,
+      avatar,
+    })
+    .then((userResp) => {
+      const { password: _, ...user } = userResp._doc;
+      res.send({ user });
+    })
     .catch((err) => {
       if (err instanceof mongoose.Error.ValidationError) {
         next(new BadRequestError("Переданы некорректные данные при создании пользователя."));
@@ -84,7 +98,7 @@ module.exports.updateAvatar = (req, res, next) => {
     }
   });
 };
-module.exports.login = (req, res, next) => { //исправить дбавлением в куки
+module.exports.login = (req, res, next) => {
   const { email, password } = req.body;
   return User.findUserByCredentials(email, password)
     .then((user) => {

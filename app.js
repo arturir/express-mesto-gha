@@ -9,13 +9,6 @@ const { PORT = 3000 } = process.env;
 const app = express();
 app.use("/", require("./routes/index"));
 
-app.use((err, req, res, next) => {
-  const { statusCode = 500, message } = err;
-  res
-    .status(statusCode)
-    .send({ message: statusCode === 500 ? "На сервере произошла ошибка" : message });
-});
-
 app.listen(PORT, () => {
   console.log(`App listening on port ${PORT}`);
 });

@@ -9,7 +9,7 @@ const {
 } = require("../controllers/users");
 
 const setCurrentUser = function (req, res, next) {
-  req.params.userId = req.user;
+  req.params.userId = req.user._id;
   next();
 };
 const validationBodyPatchMe = celebrate({
@@ -30,8 +30,9 @@ const validationParams = celebrate({
 });
 
 router.get("/", getUsers);
-router.get("/:userId", validationParams, getUserById);
+router.get("/me", setCurrentUser, validationParams, getUserById);
 router.patch("/me", validationBodyPatchMe, setCurrentUser, updateProfile);
 router.patch("/me/avatar", validationBodyPatchAvatar, updateAvatar);
+router.get("/:userId", validationParams, getUserById);
 
 module.exports = router;

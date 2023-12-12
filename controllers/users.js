@@ -10,6 +10,7 @@ const BadRequestError = require("../errors/BadRequestError");
 const UnauthorizedError = require("../errors/UnauthorizedError");
 const NotFoundError = require("../errors/NotFoundError");
 const InternalServerError = require("../errors/InternalServerError");
+const ConflictError = require("../errors/ConflictError");
 
 module.exports.getUsers = (req, res, next) => {
   User.find({})
@@ -57,6 +58,9 @@ module.exports.createUser = (req, res, next) => {
       if (err instanceof mongoose.Error.ValidationError) {
         next(new BadRequestError("Переданы некорректные данные при создании пользователя."));
       } else {
+        if (err.code === 11000) {
+          next(new ConflictError("Такой пользователь уже существует."));
+        }
         next(new InternalServerError("Произошла ошибка"));
       }
     });

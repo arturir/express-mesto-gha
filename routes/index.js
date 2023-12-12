@@ -26,12 +26,12 @@ router.use("/cards", auth, require("./cards"));
 router.post("/signin", validationBodyCreateCard, login);
 router.post("/signup", validationBodyCreateCard, createUser);
 
-router.use("*", auth, (req, res, next) => {
+router.use("*", auth, () => {
   throw new NotFoundError("Страница не найдена");
 });
 
 router.use(errors());
-router.use((err, req, res, next) => {
+router.use((err, req, res) => {
   const { statusCode = 500, message } = err;
   res
     .status(statusCode)

@@ -31,7 +31,7 @@ router.use("*", auth, () => {
 });
 
 router.use(errors());
-router.use((err, req, res) => {
+router.use((err, req, res, next) => {
   const { statusCode = 500, message } = err;
   res
     .status(statusCode)

@@ -34,13 +34,13 @@ module.exports.deleteCard = (req, res, next) => {
     } else {
       card.deleteOne()
         .then(() => { res.send({ message: "Карточка удалена" }); })
-        .catch((err) => {
-          if (err instanceof mongoose.Error.CastError) {
-            next(new BadRequestError("Переданы некорректные данные для удаления карточки."));
-          } else {
-            next(err);
-          }
-        });
+    }
+  })
+  .catch((err) => {
+    if (err instanceof mongoose.Error.CastError) {
+      next(new BadRequestError("Переданы некорректные данные для удаления карточки."));
+    } else {
+      next(err);
     }
   });
 };
